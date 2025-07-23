@@ -1,0 +1,44 @@
+steps:
+  # Step 1: Install dependencies
+  - name: 'node:18'
+    entrypoint: 'npm'
+    args: ['install']
+
+  # Step 2: Build the Vite app
+  - name: 'node:18'
+    entrypoint: 'npm'
+    args: ['run', 'build']
+    env:
+      - 'VITE_SERVER_URL=${_VITE_SERVER_URL}'
+
+  # Step 3: Build Docker image with env build arg
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      [
+        'build',
+        '-t', 'gcr.io/$PROJECT_ID/finansee-admin',
+        '--build-arg', 'VITE_SERVER_URL=${_VITE_SERVER_URL}',
+        '.'
+      ]
+
+  # Step 4: Push image to Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/finansee-admin']
+
+  # ✅ Step 5: Deploy to Cloud Run (fixed entrypoint)
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'gcloud'
+    args:
+      [
+        'run', 'deploy', 'finansee-admin',
+        '--image', 'gcr.io/$PROJECT_ID/finansee-admin',
+        '--region', 'europe-west1',
+        '--platform', 'managed',
+        '--allow-unauthenticated'
+      ]
+
+images:
+  - 'gcr.io/$PROJECT_ID/finansee-admin'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
