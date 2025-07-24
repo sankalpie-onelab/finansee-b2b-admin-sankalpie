@@ -31,18 +31,6 @@ function Dashboard() {
 
   const columnHelper = createColumnHelper<User>()
 
-  // useEffect(() => {
-  //   function handleClickOutside(event: MouseEvent) {
-  //     if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-  //       setSelectedUser(null)
-  //     }
-  //   }
-
-  //   document.addEventListener('mousedown', handleClickOutside)
-  //   return () => {
-  //     document.removeEventListener('mousedown', handleClickOutside)
-  //   }
-  // }, [])
 
   const columns = [
     columnHelper.accessor('name', {
