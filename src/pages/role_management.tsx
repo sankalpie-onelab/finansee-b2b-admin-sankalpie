@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   useCreateRolesMutation,
   useGetRolesQuery,
 } from '@/store/api';
+import { useNavigate } from 'react-router-dom';
 
 const FEATURES = [
   { key: 'product_name', label: 'Product Name' },
@@ -16,9 +17,17 @@ function RoleManagement() {
   const [roleName, setRoleName] = useState('');
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>([]);
 
-  const [createRole, { isLoading, isError, error }] = useCreateRolesMutation();
-  const { data: roles = [], refetch } = useGetRolesQuery({});
+  const [createRole, { isLoading, isError, error:mutateError }] = useCreateRolesMutation();
+  const { data: roles = [], refetch ,error:getError} = useGetRolesQuery({});
+  const navigate = useNavigate()
 
+  useEffect(() => {
+      if (getError || mutateError) {
+          console.error("API Error:", getError , mutateError);
+          navigate('/login');
+      }
+  }, [getError, mutateError, navigate]);
+  
   const handleFeatureChange = (feature: string) => {
     setSelectedFeatures((prev) =>
       prev.includes(feature)

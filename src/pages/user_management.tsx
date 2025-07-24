@@ -4,6 +4,7 @@ import { setUsersData } from '../store/reducers'
 import { useRegisterUserMutation, useGetRolesQuery } from "../store/api"
 import type { RootState } from '../store/store'
 import { setRoleData } from '../store/reducers'
+import { useNavigate } from 'react-router-dom'
 
 interface Role {
   role_name: string;
@@ -20,9 +21,17 @@ function UserManagement() {
     password: '',
     role: ''
   })
-  const [registerUser] = useRegisterUserMutation();
-  const { data: rolesData } = useGetRolesQuery({});
+  const [registerUser,{error:mutateError}] = useRegisterUserMutation();
+  const { data: rolesData , error:getError} = useGetRolesQuery({});
 
+  const navigate = useNavigate()
+
+  useEffect(() => {
+      if (getError || mutateError) {
+          console.error("API Error:", getError , mutateError);
+          navigate('/login');
+      }
+  }, [getError, mutateError, navigate]);
   const roles = useSelector((state: RootState) => state.role);
 
 
